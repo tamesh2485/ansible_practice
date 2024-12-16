@@ -8,3 +8,9 @@
       dnf:
         name: httpd
         state: latest
+
+
+    - name: 2 - Ensure to start apache
+      system:
+        name: httpd
+        state: restarted
