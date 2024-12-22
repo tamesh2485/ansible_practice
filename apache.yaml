@@ -8,9 +8,11 @@
       dnf:
         name: httpd
         state: latest
+      notify:
+        - Restart apache service
 
-
-    - name: 2 - Ensure to start apache
+  handlers:
+    - name: Restart apache service
       system:
         name: httpd
         state: restarted
