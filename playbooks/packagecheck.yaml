@@ -1,0 +1,44 @@
+## /var/tmp/tamesh_playbooks/patching_check.yaml
+---
+- name: Playbook to check packages after patching
+  hosts: all
+  become: true
+  become_method: pbrun
+  become_user: root
+
+  tasks:
+
+    - name: Ensure to run the rpm command to check the last updated packages
+      shell: |
+        rpm -qa --last | head -n 4 | grep "Tue Nov 26"
+      register: rpm
+      tags: rpmcopy
+
+    - name: Ensure to run the rpm command to check the last updated packages
+      shell: |
+        rpm -qa --last |  grep "Tue Nov 26" | wc -l
+      register: rpmcount
+      tags: rpmcount
+
+
+    - name: Append the output with hostname to a file on the Ansible control server on file /var/tmp/tamesh_playbooks/fetched.txt
+      local_action:
+        module: lineinfile
+        path: /var/tmp/tamesh_playbooks/fetched.txt
+        line: "{{ inventory_hostname }} - RPM updates on {{ ansible_date_time.date }}:\n{{ rpm.stdout_lines | join('\n') }}\n"
+        create: yes
+        insertbefore: EOF
+        mode: '0666'
+      delegate_to: localhost
+      tags: rpmcopy
+
+    - name: Append the output with hostname to a file on the Ansible control server on file /var/tmp/tamesh_playbooks/fetched1.txt
+      local_action:
+        module: lineinfile
+        path: /var/tmp/tamesh_playbooks/fetched1.txt
+        line: "{{ inventory_hostname }} - RPM updates on {{ ansible_date_time.date }}:\n{{ rpmcount.stdout_lines | join('\n') }}\n"
+        create: yes
+        insertbefore: EOF
+        mode: '0666'
+      delegate_to: localhost
+      tags: rpmcount
