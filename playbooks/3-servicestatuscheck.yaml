@@ -1,0 +1,103 @@
+---
+- name: Check if httpd service is running
+  hosts: fedora
+  become: true
+  vars:
+    svc:
+      - httpd
+      - vsftpd
+
+        #  ansible-playbook    3-servicestatuscheck.yaml  --tags=ftp  --skip-tags=noneed
+        #  ansible-playbook    3-servicestatuscheck.yaml  --tags=apache  --skip-tags=noneed
+  tasks:
+
+###httpd service
+    - name: Check if httpd service is running
+      ansible.builtin.systemd:
+        name: httpd
+      register: httpd_status
+      ignore_errors: true
+      tags:
+        - apache
+
+    - name: Display the status
+      debug:
+        var: httpd_status
+      tags:
+        - noneed
+        - apache
+
+    - name: Print a message if apache service is  running
+      debug:
+        msg: "httpd service is running"
+      when: httpd_status.status.ActiveState == "active" 
+      tags:
+        - apache
+
+
+    - name: Print a message if apache service is not running
+      debug:
+        msg: "httpd service is not running"
+      when: httpd_status.status.ActiveState != "active" 
+      tags:
+        - apache
+
+    - name: Ensure to restart the httpd service if it is not running
+      when: httpd_status.status.ActiveState != "active"
+      ansible.builtin.systemd:
+        name: httpd
+        state: started
+        enabled: yes
+        daemon-reload: yes
+      tags:
+        - apache
+
+
+    - name: Print a message if apache service is  running
+      debug:
+        msg: "httpd service is running"
+      when: httpd_status.status.ActiveState == "active"
+      tags:
+        - apache
+
+##vsftpd service
+    - name: Check if vsftpd service is running
+      ansible.builtin.systemd:
+        name: vsftpd
+      register: vsftpd_status
+      ignore_errors: true
+      tags:
+        - ftp
+
+    - name: Print a message if vsftpd service is  running
+      debug:
+        msg: "vsftpd service is running"
+      when: vsftpd_status.status.ActiveState == "active"
+      tags:
+        - ftp
+
+
+    - name: Print a message if vsftpd service is not running
+      debug:
+        msg: "vsftpd service is not running"
+      when: vsftpd_status.status.ActiveState != "active"
+      tags:
+        - ftp
+
+
+    - name: Ensure to restart the vsftpd service if it is not running
+      when: vsftpd_status.status.ActiveState != "active"
+      ansible.builtin.systemd:
+        name: vsftpd
+        state: started
+        enabled: yes
+        daemon-reload: yes
+      tags:
+        - ftp
+
+    - name: Print a message if vsftpd service is  running
+      debug:
+        msg: "vsftpd service is running"
+      when: vsftpd_status.status.ActiveState == "active"
+      tags:
+        - ftp

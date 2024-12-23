@@ -1,0 +1,21 @@
+---
+- name: Playbook to install apachea & vsftpd on CentOS
+  hosts: all
+  become: true
+  vars:
+    softwares:
+      - vsftpd
+      - httpd
+
+  tasks:
+
+    - name: Install apache if machine is centos
+      when: ansible_distribution == "CentOS"
+
+      block: 
+        - name: Ensure to install {{ softwares }}
+          package:
+            name: "{{ softwares }}"
+            state: present
+
+

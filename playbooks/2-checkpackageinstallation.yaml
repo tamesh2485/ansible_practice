@@ -1,0 +1,72 @@
+---
+- name: Playbook to check if packages are installed
+  hosts: fedora
+  become: true
+  vars:
+    softwares:
+      - vsftpd
+      - httpd
+
+
+
+  tasks:
+
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+      tags:
+        - check_installation
+
+
+    - name: Print the package facts
+      ansible.builtin.debug:
+        var: ansible_facts.packages
+      tags:
+        - noneed
+
+
+    - name: Display if apache is installed
+      debug:
+        msg: "{{ ansible_facts.packages.httpd }}"
+      when: "'httpd' in ansible_facts.packages"
+
+    - name: Display if vsftpd is installed
+      debug:
+        msg: "{{ ansible_facts.packages.vsftpd }}"
+      when: "'vsftpd' in ansible_facts.packages"
+
+    - name: Check if httpd is installed
+      debug:
+        msg: "httpd package is installed"
+      when: "'httpd' in ansible_facts.packages"
+
+    - name: Check if vsftpd is installed
+      debug:
+        msg: "vsftpd package is installed"
+      when: "'vsftpd' in ansible_facts.packages"
+
+    - name: Notify if httpd is not installed
+      debug:
+        msg: "httpd package is NOT installed"
+      when: "'httpd' not in ansible_facts.packages"
+
+    - name: Notify if vsftpd is not installed
+      debug:
+        msg: "vsftpd package is NOT installed"
+      when: "'vsftpd' not in ansible_facts.packages"
+
+    - name: Display if each software package is installed
+      debug:
+        msg: "{{ item }} package is installed"
+      when: "'{{ item }}' in ansible_facts.packages"
+      loop: "{{ softwares }}"
+      tags:
+        - check_installation
+
+    - name: Display if each software package is NOT installed
+      debug:
+        msg: "{{ item }} package is NOT installed"
+      when: "'{{ item }}' not in ansible_facts.packages"
+      loop: "{{ softwares }}"
+      tags:
+        - check_installation

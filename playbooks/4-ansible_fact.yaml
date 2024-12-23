@@ -1,0 +1,21 @@
+---
+- name: Playbook for ansible facts
+  hosts: fedora
+  tasks:
+
+    - name: Display all facts of fedora
+      debug:
+        var: ansible_facts
+      tags:
+        - noneed
+
+    - name: Display filtered facts of fedora
+      ansible.builtin.setup:
+        filter:
+          - 'ansible_distribution'
+          - 'ansible_all_ipv4_addresses'
+          - 'ansible_memtotal_mb'
+      register: showfew
+
+    - debug:
+        var: showfew

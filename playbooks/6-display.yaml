@@ -1,0 +1,20 @@
+---
+- name: artifact demo
+  hosts: fedora
+  #hosts: "{{ my_host | default('localhost') }}"
+  become: false
+  gather_facts: true
+
+  tasks:
+    - name: check the default
+      ansible.builtin.debug:
+        msg: |
+
+          My Hostname is: {{ ansible_facts['hostname'] }}
+
+          My Version of OS: {{ ansible_facts['distribution'] }}
+            
+
+    - name: check the default
+      ansible.builtin.debug:
+        msg: "My Hostname is: {{ ansible_facts['hostname'] }}\nMy Version of OS: {{ ansible_facts['distribution'] }}"

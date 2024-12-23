@@ -1,0 +1,15 @@
+---
+- name: Playbook to see custom artifacts
+  hosts: fedora
+  become: true
+
+  tasks:
+
+    - name: Ensure to show custom facts of fedora
+      ansible.builtin.setup:
+        filter:
+          - 'ansible_local'
+      register: show
+
+    - debug:
+        var: show
